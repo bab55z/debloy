@@ -1,0 +1,21 @@
+mode: new #new or update or override
+environment: dev #dev or stage or production or anything else
+server:
+  hostname: server3.boissy.williems.com
+  username: bab55z #remote server user name 
+php:
+  fpm-sock: unix:/var/run/php7-fpm.sock 
+database:
+  type: mysql #mysql
+  dbname: laravel
+  user: laravel
+  password: jdkghdfg093nc83c@idhgd009
+webserver:
+  type: nginx
+  domain-name:
+    production: laravel.app
+    dev: dev.laravel.app
+    stage: stage.laravel.app
+  enable-free-ssl: true
+compile-javascipt: false
+  
