@@ -17,7 +17,7 @@ DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 DEPLOY_GIT_REPO_NAME="${D_ENV}.${DOMAIN_NAME}.git" 
 POST_RECEIVE_HOOK_PATH="${DEPLOY_GIT_REPO_NAME}/hooks/post-receive"
 
-NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${D_ENV}.${DOMAIN_NAME}"
+NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
 ENV_TEMPLATE_URL= "https://raw.githubusercontent.com/laravel/laravel/v${laravel_version}/.env.example"
@@ -35,7 +35,7 @@ touch $POST_RECEIVE_HOOK_PATH
 sudo chmod +x $POST_RECEIVE_HOOK_PATH
 
 # configure post-receive hook
-cat debloy/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH
+bash -c "cat debloy/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
 sed -i "s/WEBDIRVALUE/${WEB_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s/GITDIRVALUE/${DEPLOY_GIT_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
 
@@ -49,12 +49,17 @@ sudo chown -R www-data:www-data $WEB_FOLDER
 # SET PROPER WEB FOLDER PERMISSIONS
 setfacl -R -m u:$server_username:rwx $WEB_FOLDER
 
+# GIVE ADMIN USER PERMISSIONS
+sudo setfacl -R -m u:${server_username}:rwx $WEB_FOLDER
+
+
 # CREATE NGINX HOST FILE
 sudo touch $NGINX_HOST_FILE_PATH
-cat debloy/stubs/nginx-host >> $NGINX_HOST_FILE_PATH
-sed -i "s/SERVERNAMEVALUE/${DOMAIN_NAME}/" "$NGINX_HOST_FILE_PATH"
-sed -i "s/ROOTDIRVALUE/${WEB_FOLDER}/" "$NGINX_HOST_FILE_PATH"
-sed -i "s/PHPFPMSOCKVALUE/${php_fpm_sock}/" "$NGINX_HOST_FILE_PATH"
+sudo bash -c "cat debloy/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
+
+sudo sed -i "s/SERVERNAMEVALUE/${DOMAIN_NAME}/" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s/ROOTDIRVALUE/${WEB_FOLDER}/" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s/PHPFPMSOCKVALUE/${php_fpm_sock}/" "$NGINX_HOST_FILE_PATH"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 NGINX_TEST= `sudo nginx -t`
