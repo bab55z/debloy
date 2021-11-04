@@ -20,6 +20,11 @@ POST_RECEIVE_HOOK_PATH="${DEPLOY_GIT_REPO_NAME}/hooks/post-receive"
 NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${D_ENV}.${DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
+ENV_TEMPLATE_URL= "https://raw.githubusercontent.com/laravel/laravel/v${laravel_version}/.env.example"
+ENV_FILE_DEPLOY_PATH= "${WEB_FOLDER}/.env"
+LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
+
+
 # CREATE GIT BARE REPO
 setfacl -R -m u:$server_username:rwx $DEPLOY_GIT_FOLDER
 cd $DEPLOY_GIT_FOLDER
@@ -77,3 +82,22 @@ MYSQL_SCRIPT
 fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING 
+if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; then 
+   echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
+   sudo touch $ENV_FILE_DEPLOY_PATH
+   ENVTEMPLATE=`curl -L $ENV_TEMPLATE_URL`
+   cat $ENVTEMPLATE >> $ENV_FILE_DEPLOY_PATH
+
+   sed -i "s/APP_NAME=Laravel/${WEB_FOLDER}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/APP_ENV=local/APP_ENV=${D_ENV}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/APP_URL=http://localhost/APP_URL=https${DOMAIN_NAME}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${database_dbname}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/DB_USERNAME=root/DB_USERNAME=${database_user}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/DB_PASSWORD=/DB_PASSWORD=${database_password}/" "$ENV_FILE_DEPLOY_PATH"
+
+   #notify that laravel app key was not yet generated
+   sudo touch $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH
+
+else
+   echo ".env.example template of provided laravel version(${laravel_version}) could not be retrieved from (${ENV_TEMPLATE_URL})"
+fi
