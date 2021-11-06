@@ -1,3 +1,4 @@
+site-name: Neosurf Africa
 mode: new #new or update or override
 environment: dev #dev or stage or production or anything else
 laravel: 

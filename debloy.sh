@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DEBLOYROOT="/var/repo/debloy"
+
 # include parse_yaml function and read params
 . lib/parse_yaml.sh
 create_variables debloy.yml
@@ -10,7 +12,7 @@ WEB_FOLDER="/var/www/html/stage/stage.neosurf.africa"
 
 GIT_BASE_FOLDER="/var/repo"
 DEPLOY_GIT_FOLDER="${GIT_BASE_FOLDER}/${D_ENV}"
-
+	
 DOMAIN_NAME_VARIABLE="webserver_domain_name_${D_ENV}"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 
@@ -35,9 +37,10 @@ touch $POST_RECEIVE_HOOK_PATH
 sudo chmod +x $POST_RECEIVE_HOOK_PATH
 
 # configure post-receive hook
-bash -c "cat debloy/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
+bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
 sed -i "s/WEBDIRVALUE/${WEB_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s/GITDIRVALUE/${DEPLOY_GIT_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s/ADMINUSERNAMEVALUE/${server_username}/" "$POST_RECEIVE_HOOK_PATH"
 
 # CREATE WED FOLDER
 
@@ -55,10 +58,10 @@ sudo setfacl -R -m u:${server_username}:rwx $WEB_FOLDER
 
 # CREATE NGINX HOST FILE
 sudo touch $NGINX_HOST_FILE_PATH
-sudo bash -c "cat debloy/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
+sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
 
 sudo sed -i "s/SERVERNAMEVALUE/${DOMAIN_NAME}/" "$NGINX_HOST_FILE_PATH"
-sudo sed -i "s/ROOTDIRVALUE/${WEB_FOLDER}/" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s/PHPFPMSOCKVALUE/${php_fpm_sock}/" "$NGINX_HOST_FILE_PATH"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
@@ -75,15 +78,15 @@ fi
 
 # CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
 if [ -d /var/lib/mysql/databasename ] ; then 
-   echo "database already exists, cannot create database"
-else
    echo "creating database"
-   mysql -u root <<MYSQL_SCRIPT
+   sudo mysql -u root <<MYSQL_SCRIPT
    CREATE DATABASE $database_dbname;
    CREATE USER '$database_user'@'localhost' IDENTIFIED BY '$database_password';
    GRANT ALL PRIVILEGES ON $database_dbname.* TO '$database_user'@'localhost';
    FLUSH PRIVILEGES;
 MYSQL_SCRIPT
+else
+   echo "database already exists, cannot create database"
 fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING 
@@ -93,9 +96,9 @@ if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; 
    ENVTEMPLATE=`curl -L $ENV_TEMPLATE_URL`
    cat $ENVTEMPLATE >> $ENV_FILE_DEPLOY_PATH
 
-   sed -i "s/APP_NAME=Laravel/${WEB_FOLDER}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/APP_NAME=Laravel/APP_NAME=\"${site_name}\"/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/APP_ENV=local/APP_ENV=${D_ENV}/" "$ENV_FILE_DEPLOY_PATH"
-   sed -i "s/APP_URL=http://localhost/APP_URL=https${DOMAIN_NAME}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s/APP_URL=http://localhost/APP_URL=https:\/\/${DOMAIN_NAME}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${database_dbname}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_USERNAME=root/DB_USERNAME=${database_user}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_PASSWORD=/DB_PASSWORD=${database_password}/" "$ENV_FILE_DEPLOY_PATH"

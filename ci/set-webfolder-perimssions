@@ -1,0 +1,30 @@
+#!/bin/bash
+WEBFOLDER= $1
+ADMINUSERNAME= $2
+
+if [[ -z $WEBFOLDER ]]
+    echo "web folder is required as first argument"
+    exit 1
+fi
+
+if [[ -z $ADMINUSERNAME ]]
+    echo "admin username is required as second argument"
+    exit 1
+fi
+
+
+#change web directory owner to www-data
+sudo chown -R www-data:www-data $WEBFORLDER
+sudo usermod -a -G www-data $ADMINUSERNAME
+
+#set proper files permission
+sudo find $WEBFORLDER -type f -exec chmod 644 {} \;
+
+#set proper directories permission
+sudo find $WEBFORLDER -type d -exec chmod 755 {} \;
+
+sudo chgrp -R www-data storage "${WEBFORLDER}/bootstrap/cache"
+sudo chmod -R ug+rwx storage "${WEBFORLDER}/bootstrap/cache"
+
+#admin user permission
+sudo setfacl -R -m u:${ADMINUSERNAME}:rwx $WEBFOLDER
