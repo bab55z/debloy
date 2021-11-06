@@ -135,7 +135,6 @@ php artisan up
 echo "Deployment finished!"
 
 #set proper permissions on files
-
 debloy/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
 
 exit 0
