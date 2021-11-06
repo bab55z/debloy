@@ -62,17 +62,17 @@ done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
-if [[ -z $WEBDIRECTORY ]]
+if [[ -z $WEBDIRECTORY ]]; then
     echo "the web directory is required use -h flag for for help"
     exit 1
 fi
 
-if [[ -z $GITDIRECTORY ]]
+if [[ -z $GITDIRECTORY ]]; then
     echo "the git directory is required use -h flag for for help"
     exit 1
 fi
 
-if [[ -z $ADMINUSERNAME ]]
+if [[ -z $ADMINUSERNAME ]]; then
     echo "the admin username is required use -h flag for for help"
     exit 1
 fi

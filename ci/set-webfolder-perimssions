@@ -2,12 +2,12 @@
 WEBFOLDER= $1
 ADMINUSERNAME= $2
 
-if [[ -z $WEBFOLDER ]]
+if [[ -z $WEBFOLDER ]]; then
     echo "web folder is required as first argument"
     exit 1
 fi
 
-if [[ -z $ADMINUSERNAME ]]
+if [[ -z $ADMINUSERNAME ]]; then
     echo "admin username is required as second argument"
     exit 1
 fi
