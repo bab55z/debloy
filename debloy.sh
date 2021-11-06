@@ -1,14 +1,65 @@
 #!/bin/bash
 
 DEBLOYROOT="/var/repo/debloy"
+DEBLOYYAMLFILE="debloy.yml"
+DBDUMFILE=
+
+PARAMS=""
+
+while (( "$#" )); do
+  case "$1" in
+    -y|--yaml-file)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        DEBLOYYAMLFILE=$2
+        shift 2
+      else
+        echo "Error: web directory argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
+    -d|--database-dump-file)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        DBDUMFILE=$2
+        shift 2
+      else
+        echo "Error: git directory argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
+    -h|--help)
+      echo -e "\n\n\t\t----Debloy Help----\n"
+      echo -e "\t-y, --yaml-file \t\t  config yaml file\n\t-d, --database-dump-file \t  database dump file"
+      echo -e "\n\n"
+      exit 0
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
 
 # include parse_yaml function and read params
 . lib/parse_yaml.sh
-create_variables debloy.yml
+create_variables $DEBLOYYAMLFILE
+
+## TEST
+#echo "debloy config file -> $DEBLOYYAMLFILE"
+#echo "db dump file -> $DBDUMFILE"
+#echo "site title -> ${site_name}"
+#exit 0
+## END TEST
 
 #variables 
 D_ENV=${environment,,}
-WEB_FOLDER="/var/www/html/stage/stage.neosurf.africa"
+WEB_FOLDER="${webserver_folder}"
 
 GIT_BASE_FOLDER="/var/repo"
 DEPLOY_GIT_FOLDER="${GIT_BASE_FOLDER}/${D_ENV}"

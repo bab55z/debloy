@@ -43,7 +43,7 @@ while (( "$#" )); do
       shift
       ;;
     -h|--help)
-      echo -e "\n\n\t\t----Debloy Help----\n"
+      echo -e "\n\n\t\t----Process git post receive hook Help----\n"
       echo -e "\t-w, --web-directory \t  web folder\n\t-g, --git-directory \t  git folder\n\t-u, --admin-username \t  admin username"
       echo -e "\t-c, --compile-js \t  compile js components \n\t-r, --remove-node-vendor  remove node vendor directory after js compile\n\n"      
       exit 0
