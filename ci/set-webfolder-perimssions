@@ -1,4 +1,5 @@
 #!/bin/bash
+
 WEBFOLDER=$1
 ADMINUSERNAME=$2
 
