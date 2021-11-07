@@ -85,7 +85,7 @@ fi
 
 # START DEPLOYMENT PROCESS
 
-echo "----Starting app git deployment----"
+echo "----Starting app git deployment from process post receive script----"
 
 echo "Pushing $COMMIT to repository."
 echo "Suspending Application"
