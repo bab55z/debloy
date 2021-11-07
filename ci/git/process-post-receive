@@ -4,6 +4,7 @@
 COMPILEJS=0
 REMOVE_NODEVENDOR=0
 PARAMS=""
+DEBLOYROOT="/var/repo/debloy"
 
 while (( "$#" )); do
   case "$1" in
@@ -136,7 +137,9 @@ php artisan up
 echo "Deployment finished!"
 
 #set proper permissions on files
-debloy/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
+$DEBLOYROOT/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
+
+echo "cheking if first deployment $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
 
 if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
  #generate app key if not not yet generated
@@ -148,6 +151,8 @@ if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
  #link storage
  echo "linking storage also"
  php artisan storage:link
+else
+ echo "not first deployment, not generating key and linking storage"
 fi
 
 
