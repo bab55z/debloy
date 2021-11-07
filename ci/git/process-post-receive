@@ -134,7 +134,7 @@ php artisan view:cache
 echo "Bringing Application Online"
 php artisan up
 
-echo "cheking if first deployment $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
+echo "cheking if first deployment"
 
 if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
  #generate app key if not not yet generated
