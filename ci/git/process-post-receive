@@ -152,7 +152,7 @@ fi
 
 #set proper permissions on files
 echo "setting proper permissions"
-$DEBLOYROOT/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
+$DEBLOYROOT/ci/set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME"
 
 echo "Deployment finished!"
 
