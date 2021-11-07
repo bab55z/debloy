@@ -134,11 +134,6 @@ php artisan view:cache
 echo "Bringing Application Online"
 php artisan up
 
-echo "Deployment finished!"
-
-#set proper permissions on files
-$DEBLOYROOT/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
-
 echo "cheking if first deployment $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
 
 if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
@@ -155,5 +150,10 @@ else
  echo "not first deployment, not generating key and linking storage"
 fi
 
+#set proper permissions on files
+echo "setting proper permissions"
+$DEBLOYROOT/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
+
+echo "Deployment finished!"
 
 exit 0
