@@ -84,6 +84,7 @@ fi
 #echo "remove node vendor is $REMOVE_NODEVENDOR"
 
 # START DEPLOYMENT PROCESS
+LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEBDIRECTORY}/.appkey_notgenerated"
 
 echo "----Starting app git deployment from process post receive script----"
 
@@ -136,5 +137,18 @@ echo "Deployment finished!"
 
 #set proper permissions on files
 debloy/ci/set-webfolder-perimssions "$WEBDIRECTORY" "$ADMINUSERNAME"
+
+if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
+ #generate app key if not not yet generated
+ echo "app key not yet generated, generating"
+ php artisan key:generate
+
+ rm -f $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH
+
+ #link storage
+ echo "linking storage also"
+ php artisan storage:link
+fi
+
 
 exit 0
