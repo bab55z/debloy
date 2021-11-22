@@ -2,7 +2,7 @@
 
 DEBLOYROOT="/var/repo/debloy"
 DEBLOYYAMLFILE="debloy.yml"
-DBDUMFILE=
+DBDUMPFILE=
 
 PARAMS=""
 
@@ -19,7 +19,7 @@ while (( "$#" )); do
       ;;
     -d|--database-dump-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        DBDUMFILE=$2
+        DBDUMPFILE=$2
         shift 2
       else
         echo "Error: git directory argument for $1 is missing" >&2
@@ -57,24 +57,24 @@ create_variables $DEBLOYYAMLFILE
 #exit 0
 ## END TEST
 
-#variables 
+#variables
 D_ENV=${environment,,}
 WEB_FOLDER="${webserver_folder}"
 
 GIT_BASE_FOLDER="/var/repo"
 DEPLOY_GIT_FOLDER="${GIT_BASE_FOLDER}/${D_ENV}"
-	
+
 DOMAIN_NAME_VARIABLE="webserver_domain_name_${D_ENV}"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 
-DEPLOY_GIT_REPO_NAME="${D_ENV}.${DOMAIN_NAME}.git" 
+DEPLOY_GIT_REPO_NAME="${D_ENV}.${DOMAIN_NAME}.git"
 POST_RECEIVE_HOOK_PATH="${DEPLOY_GIT_REPO_NAME}/hooks/post-receive"
 
 NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
-ENV_TEMPLATE_URL= "https://raw.githubusercontent.com/laravel/laravel/v${laravel_version}/.env.example"
-ENV_FILE_DEPLOY_PATH= "${WEB_FOLDER}/.env"
+ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v${laravel_version}/.env.example"
+ENV_FILE_DEPLOY_PATH="${WEB_FOLDER}/.env"
 LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
 
 
@@ -89,10 +89,10 @@ sudo chmod +x $POST_RECEIVE_HOOK_PATH
 
 # configure post-receive hook
 bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
-sed -i "s/WEBDIRVALUE/${WEB_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
-sed -i "s/GITDIRVALUE/${DEPLOY_GIT_FOLDER}/" "$POST_RECEIVE_HOOK_PATH"
-sed -i "s/ADMINUSERNAMEVALUE/${server_username}/" "$POST_RECEIVE_HOOK_PATH"
-sed -i "s/DEBLOYROOTVALUE/${DEBLOYROOT}/" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=WEBDIRVALUE=${WEB_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
 # CREATE WED FOLDER
 
 sudo mkdir $WEB_FOLDER
@@ -111,9 +111,9 @@ sudo setfacl -R -m u:${server_username}:rwx $WEB_FOLDER
 sudo touch $NGINX_HOST_FILE_PATH
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
 
-sudo sed -i "s/SERVERNAMEVALUE/${DOMAIN_NAME}/" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
-sudo sed -i "s/PHPFPMSOCKVALUE/${php_fpm_sock}/" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 NGINX_TEST= `sudo nginx -t`
@@ -128,7 +128,7 @@ else
 fi
 
 # CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
-if [ -d /var/lib/mysql/databasename ] ; then 
+if [ -d /var/lib/mysql/databasename ] ; then
    echo "creating database"
    sudo mysql -u root <<MYSQL_SCRIPT
    CREATE DATABASE $database_dbname;
@@ -140,16 +140,16 @@ else
    echo "database already exists, cannot create database"
 fi
 
-# ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING 
-if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; then 
+# ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
+if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; then
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
    sudo touch $ENV_FILE_DEPLOY_PATH
    ENVTEMPLATE=`curl -L $ENV_TEMPLATE_URL`
    cat $ENVTEMPLATE >> $ENV_FILE_DEPLOY_PATH
 
-   sed -i "s/APP_NAME=Laravel/APP_NAME=\"${site_name}\"/" "$ENV_FILE_DEPLOY_PATH"
-   sed -i "s/APP_ENV=local/APP_ENV=${D_ENV}/" "$ENV_FILE_DEPLOY_PATH"
-   sed -i "s/APP_URL=http://localhost/APP_URL=https:\/\/${DOMAIN_NAME}/" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s@APP_NAME=Laravel@APP_NAME=\"${site_name}\"@" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s@APP_ENV=local@APP_ENV=${D_ENV}@" "$ENV_FILE_DEPLOY_PATH"
+   sed -i "s@APP_URL=http://localhost@APP_URL=https://${DOMAIN_NAME}@" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${database_dbname}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_USERNAME=root/DB_USERNAME=${database_user}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_PASSWORD=/DB_PASSWORD=${database_password}/" "$ENV_FILE_DEPLOY_PATH"
