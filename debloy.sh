@@ -136,7 +136,7 @@ echo "configuring nginx host file OK"
 # TEST NGINX, activate hosts AND RESTART SERVICE
 echo "testing nginx configuration"
 
-if sudo nginx -t | grep 'successful'; then
+if sudo nginx -t 2>&1 | grep 'successful'; then
    echo "Nginx config is ok, deploying site and restarting service"
    sudo ln -s "$NGINX_HOST_FILE_PATH" $NGINX_ENABLED_SITES_PATH
    sudo service nginx stop && sudo service nginx start
