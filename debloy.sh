@@ -58,6 +58,7 @@ create_variables $DEBLOYYAMLFILE
 ## END TEST
 
 #variables
+echo "initializing variables"
 D_ENV=${environment,,}
 WEB_FOLDER="${webserver_folder}"
 
@@ -79,43 +80,62 @@ ENV_FILE_DEPLOY_PATH="$WEB_FOLDER/.env"
 LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
 
 # CREATE GIT BARE REPO
+echo "initializing git bare repository"
 setfacl -R -m u:"$server_username":rwx "$DEPLOY_GIT_FOLDER"
 cd "$git_bare_root" || exit
 git init --bare "$DEPLOY_GIT_REPO_NAME"
+echo "initializing git bare repository done"
 
 # SET UP GIT POST-RECEIVE HOOK DEPLOYMENT
+echo "setting up git post receive hook"
 touch "$POST_RECEIVE_HOOK_PATH"
 sudo chmod +x "$POST_RECEIVE_HOOK_PATH"
+echo "setting up git post receive hook done successfully"
 
 # configure post-receive hook
+echo "configuring git post receive hook"
 bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
 sed -i "s=WEBDIRVALUE=${WEB_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
-# CREATE WED FOLDER
+echo "configuring git post receive hook"
 
+# CREATE WED FOLDER
+echo "creating web folder"
 sudo mkdir "$WEB_FOLDER"
+echo "creating web folder done successfully"
 
 # SET WEB FOLDER OWNER TO WWW-DATA
+echo "setting web folder owner to www-data"
 sudo chown -R www-data:www-data "$WEB_FOLDER"
+echo "setting web folder owner to www-data done successfully"
 
 # SET PROPER WEB FOLDER PERMISSIONS
+echo "setting proper web folder permissions"
 setfacl -R -m u:"$server_username":rwx "$WEB_FOLDER"
+echo "setting proper web folder permissions done"
 
 # GIVE ADMIN USER PERMISSIONS
+echo "giving admin user proper permissions to web folder"
 sudo setfacl -R -m u:"${server_username}":rwx "$WEB_FOLDER"
+echo "giving admin user proper permissions to web folder done"
 
 
 # CREATE NGINX HOST FILE
+echo "creating nginx hosting file"
 sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
+echo "creating nginx hosting file done successfully"
 
+echo "configuring nginx hosting file"
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
+echo "configuring nginx hosting file successfully"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
+echo "testing nginx configuration"
 NGINX_TEST=`sudo nginx -t`
 
 if [[ $NGINX_TEST =~ "successful" ]]; then
@@ -126,8 +146,10 @@ if [[ $NGINX_TEST =~ "successful" ]]; then
 else
   echo "Nginx config is not ok, not deploying site"
 fi
+echo "testing nginx configuration done"
 
 # CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
+echo "setting up database"
 if [ -d /var/lib/mysql/databasename ] ; then
    echo "creating database"
    sudo mysql -u root <<MYSQL_SCRIPT
@@ -148,12 +170,14 @@ else
 fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
+echo "setting up app .env file"
 if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
    sudo touch "$ENV_FILE_DEPLOY_PATH"
    ENVTEMPLATE=`curl -L "$ENV_TEMPLATE_URL"`
    cat "$ENVTEMPLATE" >> "$ENV_FILE_DEPLOY_PATH"
 
+   echo "configuring app .env file"
    sed -i "s@APP_NAME=Laravel@APP_NAME=\"${site_name}\"@" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s@APP_ENV=local@APP_ENV=${D_ENV}@" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s@APP_URL=http://localhost@APP_URL=https://${DOMAIN_NAME}@" "$ENV_FILE_DEPLOY_PATH"
@@ -163,7 +187,7 @@ if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null
 
    #notify that laravel app key was not yet generated
    sudo touch "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
-
+   echo "setting up app .env file done"
 else
    echo ".env.example template of provided laravel version(${laravel_version}) could not be retrieved from (${ENV_TEMPLATE_URL})"
 fi
