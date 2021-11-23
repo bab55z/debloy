@@ -132,10 +132,17 @@ if [ -d /var/lib/mysql/databasename ] ; then
    echo "creating database"
    sudo mysql -u root <<MYSQL_SCRIPT
    CREATE DATABASE $database_dbname;
-   CREATE USER '$database_user'@'localhost' IDENTIFIED BY '$database_password';
-   GRANT ALL PRIVILEGES ON $database_dbname.* TO '$database_user'@'localhost';
+   CREATE USER '$database_user'@'%' IDENTIFIED BY '$database_password';
+   GRANT ALL PRIVILEGES ON $database_dbname.* TO '$database_user'@'%';
    FLUSH PRIVILEGES;
 MYSQL_SCRIPT
+  #Import database if provided
+  if [ -f "$DBDUMPFILE" ]; then
+    echo "importing database"
+    mysql -u "$database_user" -p"$database_password" "$database_dbname" < "$DBDUMPFILE"
+  else
+    echo "database dump file not provided or wrong path, not importing database"
+  fi
 else
    echo "database already exists, cannot create database"
 fi
