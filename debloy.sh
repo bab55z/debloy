@@ -62,15 +62,13 @@ echo "initializing variables"
 D_ENV=${environment,,}
 WEB_FOLDER="${webserver_folder}"
 
-GIT_BASE_FOLDER="$git_bare_root_folder"
-DEPLOY_GIT_FOLDER="$GIT_BASE_FOLDER/$git_bare_repo_name"
+DEPLOY_GIT_FOLDER="$git_bare_root_folder/$git_bare_repo_name"
 
 DOMAIN_NAME_VARIABLE="webserver_domain_name_${D_ENV}"
 MAIN_DOMAIN_NAME="$webserver_domain_name_main"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 
-DEPLOY_GIT_REPO_NAME="$git_bare_repo_name"
-POST_RECEIVE_HOOK_PATH="${DEPLOY_GIT_REPO_NAME}/hooks/post-receive"
+POST_RECEIVE_HOOK_PATH="${git_bare_repo_name}/hooks/post-receive"
 
 NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
@@ -81,9 +79,10 @@ LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
 
 # CREATE GIT BARE REPO
 echo "initializing git bare repository"
+# shellcheck disable=SC2164
+cd "$git_bare_root_folder"
+git init --bare "$git_bare_repo_name"
 setfacl -R -m u:"$server_username":rwx "$DEPLOY_GIT_FOLDER"
-cd "$git_bare_root" || exit
-git init --bare "$DEPLOY_GIT_REPO_NAME"
 echo "initializing git bare repository done"
 
 # SET UP GIT POST-RECEIVE HOOK DEPLOYMENT
@@ -136,7 +135,7 @@ echo "configuring nginx hosting file successfully"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 echo "testing nginx configuration"
-NGINX_TEST=`sudo nginx -t`
+NGINX_TEST=$(sudo nginx -t)
 
 if [[ $NGINX_TEST =~ "successful" ]]; then
   echo "Nginx config is ok, deploying site and restarting service"
@@ -171,10 +170,12 @@ fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
 echo "setting up app .env file"
-if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
+#if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
+if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_URL" | grep "200" > /dev/null; then
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
    sudo touch "$ENV_FILE_DEPLOY_PATH"
-   ENVTEMPLATE=`curl -L "$ENV_TEMPLATE_URL"`
+   ENVTEMPLATE=$(curl -L "$ENV_TEMPLATE_URL")
+   echo "$ENVTEMPLATE"
    cat "$ENVTEMPLATE" >> "$ENV_FILE_DEPLOY_PATH"
 
    echo "configuring app .env file"
