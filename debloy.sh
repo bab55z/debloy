@@ -122,16 +122,16 @@ echo "giving admin user proper permissions to web folder done"
 
 
 # CREATE NGINX HOST FILE
-echo "creating nginx hosting file"
+echo "creating nginx host file"
 sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
-echo "creating nginx hosting file done OK"
+echo "creating nginx host file done OK"
 
-echo "configuring nginx hosting file"
+echo "configuring nginx host file"
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
-echo "configuring nginx hosting file OK"
+echo "configuring nginx host file OK"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 echo "testing nginx configuration"
