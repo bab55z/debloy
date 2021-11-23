@@ -149,7 +149,9 @@ echo "testing nginx configuration done"
 # CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
 echo "setting up database"
 if [ -d "/var/lib/mysql/$database_dbname" ] ; then
-   echo "creating database"
+   echo "a database with the same name ($database_dbname) already exists, cannot create database"
+else
+   echo "creating database with name ($database_dbname)"
    sudo mysql -u root <<MYSQL_SCRIPT
    CREATE DATABASE $database_dbname;
    CREATE USER '$database_user'@'%' IDENTIFIED BY '$database_password';
@@ -163,8 +165,6 @@ MYSQL_SCRIPT
   else
     echo "database dump file not provided or wrong path, not importing database"
   fi
-else
-   echo "database already exists or invalid db name, cannot create database"
 fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
