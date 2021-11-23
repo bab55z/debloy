@@ -1,27 +1,35 @@
 site-name: Neosurf Africa
 mode: new #new or update or override
 environment: dev #dev or stage or production or anything else
-laravel: 
+laravel:
   version: 8.0.0 #full laravel version e.g. 8.0.1, used to retrieve latest .env.example,...
 server:
   hostname: server3.boissy.williems.com
-  username: bab55z #remote server user name 
+  username: bab55z #remote server user name
 php:
-  fpm-sock: unix:/var/run/php7-fpm.sock 
+  fpm-sock: unix:/var/run/php7-fpm.sock
 database:
   type: mysql #mysql
   dbname: laravel
   user: laravel
   password: jdkghdfg093nc83c@idhgd009
+git-bare:
+  root-folder: /var/repo/production
+  repo-name: neosurf.africa.git
 webserver:
   type: nginx
   folder: /var/www/html/stage/stage.neosurf.africa # app web root folder
   domain-name:
+    main: neosurf.africa
     production: laravel.app
     dev: dev.laravel.app
     stage: stage.laravel.app
+    others:
+      - laravel.app
+      - dev.laravel.app
+      - stage.laravel.app
   ssl:
     enabled: true
     letsencrypt: false
 compile-javascipt: false
-  
+

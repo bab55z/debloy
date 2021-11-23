@@ -61,31 +61,31 @@ create_variables $DEBLOYYAMLFILE
 D_ENV=${environment,,}
 WEB_FOLDER="${webserver_folder}"
 
-GIT_BASE_FOLDER="/var/repo"
-DEPLOY_GIT_FOLDER="${GIT_BASE_FOLDER}/${D_ENV}"
+GIT_BASE_FOLDER="$git_bare_root_folder"
+DEPLOY_GIT_FOLDER="$GIT_BASE_FOLDER/$git_bare_repo_name"
 
 DOMAIN_NAME_VARIABLE="webserver_domain_name_${D_ENV}"
+MAIN_DOMAIN_NAME="$webserver_domain_name_main"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 
-DEPLOY_GIT_REPO_NAME="${D_ENV}.${DOMAIN_NAME}.git"
+DEPLOY_GIT_REPO_NAME="$git_bare_repo_name"
 POST_RECEIVE_HOOK_PATH="${DEPLOY_GIT_REPO_NAME}/hooks/post-receive"
 
-NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${DOMAIN_NAME}"
+NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
-ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v${laravel_version}/.env.example"
-ENV_FILE_DEPLOY_PATH="${WEB_FOLDER}/.env"
+ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v$laravel_version/.env.example"
+ENV_FILE_DEPLOY_PATH="$WEB_FOLDER/.env"
 LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
 
-
 # CREATE GIT BARE REPO
-setfacl -R -m u:$server_username:rwx $DEPLOY_GIT_FOLDER
-cd $DEPLOY_GIT_FOLDER
-git init --bare $DEPLOY_GIT_REPO_NAME
+setfacl -R -m u:"$server_username":rwx "$DEPLOY_GIT_FOLDER"
+cd "$git_bare_root" || exit
+git init --bare "$DEPLOY_GIT_REPO_NAME"
 
-# SET UP GIT POST-RECEIVE HOOK DEOKYMENT
-touch $POST_RECEIVE_HOOK_PATH
-sudo chmod +x $POST_RECEIVE_HOOK_PATH
+# SET UP GIT POST-RECEIVE HOOK DEPLOYMENT
+touch "$POST_RECEIVE_HOOK_PATH"
+sudo chmod +x "$POST_RECEIVE_HOOK_PATH"
 
 # configure post-receive hook
 bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
@@ -95,20 +95,20 @@ sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
 # CREATE WED FOLDER
 
-sudo mkdir $WEB_FOLDER
+sudo mkdir "$WEB_FOLDER"
 
 # SET WEB FOLDER OWNER TO WWW-DATA
-sudo chown -R www-data:www-data $WEB_FOLDER
+sudo chown -R www-data:www-data "$WEB_FOLDER"
 
 # SET PROPER WEB FOLDER PERMISSIONS
-setfacl -R -m u:$server_username:rwx $WEB_FOLDER
+setfacl -R -m u:"$server_username":rwx "$WEB_FOLDER"
 
 # GIVE ADMIN USER PERMISSIONS
-sudo setfacl -R -m u:${server_username}:rwx $WEB_FOLDER
+sudo setfacl -R -m u:"${server_username}":rwx "$WEB_FOLDER"
 
 
 # CREATE NGINX HOST FILE
-sudo touch $NGINX_HOST_FILE_PATH
+sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
 
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
@@ -116,11 +116,11 @@ sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
-NGINX_TEST= `sudo nginx -t`
+NGINX_TEST=`sudo nginx -t`
 
 if [[ $NGINX_TEST =~ "successful" ]]; then
   echo "Nginx config is ok, deploying site and restarting service"
-  sudo ln -s $NGINX_HOST_FILE_PATH $NGINX_ENABLED_SITES_PATH
+  sudo ln -s "$NGINX_HOST_FILE_PATH" $NGINX_ENABLED_SITES_PATH
   sudo service nginx stop && sudo service nginx start
   echo "Site enabled successfully"
 else
@@ -141,11 +141,11 @@ else
 fi
 
 # ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
-if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; then
+if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
-   sudo touch $ENV_FILE_DEPLOY_PATH
-   ENVTEMPLATE=`curl -L $ENV_TEMPLATE_URL`
-   cat $ENVTEMPLATE >> $ENV_FILE_DEPLOY_PATH
+   sudo touch "$ENV_FILE_DEPLOY_PATH"
+   ENVTEMPLATE=`curl -L "$ENV_TEMPLATE_URL"`
+   cat "$ENVTEMPLATE" >> "$ENV_FILE_DEPLOY_PATH"
 
    sed -i "s@APP_NAME=Laravel@APP_NAME=\"${site_name}\"@" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s@APP_ENV=local@APP_ENV=${D_ENV}@" "$ENV_FILE_DEPLOY_PATH"
@@ -155,7 +155,7 @@ if curl -s --head  --request GET $ENV_TEMPLATE_URL | grep "200 OK" > /dev/null; 
    sed -i "s/DB_PASSWORD=/DB_PASSWORD=${database_password}/" "$ENV_FILE_DEPLOY_PATH"
 
    #notify that laravel app key was not yet generated
-   sudo touch $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH
+   sudo touch "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
 
 else
    echo ".env.example template of provided laravel version(${laravel_version}) could not be retrieved from (${ENV_TEMPLATE_URL})"
