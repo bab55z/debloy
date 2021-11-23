@@ -89,7 +89,7 @@ echo "initializing git bare repository done"
 echo "setting up git post receive hook"
 touch "$POST_RECEIVE_HOOK_PATH"
 sudo chmod +x "$POST_RECEIVE_HOOK_PATH"
-echo "setting up git post receive hook done successfully"
+echo "setting up git post receive hook done OK"
 
 # configure post-receive hook
 echo "configuring git post receive hook"
@@ -98,17 +98,17 @@ sed -i "s=WEBDIRVALUE=${WEB_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
-echo "configuring git post receive hook"
+echo "configuring git post receive hook done"
 
 # CREATE WED FOLDER
 echo "creating web folder"
 sudo mkdir "$WEB_FOLDER"
-echo "creating web folder done successfully"
+echo "creating web folder done OK"
 
 # SET WEB FOLDER OWNER TO WWW-DATA
 echo "setting web folder owner to www-data"
 sudo chown -R www-data:www-data "$WEB_FOLDER"
-echo "setting web folder owner to www-data done successfully"
+echo "setting web folder owner to www-data done OK"
 
 # SET PROPER WEB FOLDER PERMISSIONS
 echo "setting proper web folder permissions"
@@ -125,13 +125,13 @@ echo "giving admin user proper permissions to web folder done"
 echo "creating nginx hosting file"
 sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
-echo "creating nginx hosting file done successfully"
+echo "creating nginx hosting file done OK"
 
 echo "configuring nginx hosting file"
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
-echo "configuring nginx hosting file successfully"
+echo "configuring nginx hosting file OK"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 echo "testing nginx configuration"
@@ -140,7 +140,7 @@ if sudo nginx -t | grep 'successful'; then
    echo "Nginx config is ok, deploying site and restarting service"
    sudo ln -s "$NGINX_HOST_FILE_PATH" $NGINX_ENABLED_SITES_PATH
    sudo service nginx stop && sudo service nginx start
-   echo "Site enabled successfully"
+   echo "Site enabled OK"
 else
    echo "Nginx config is not ok, not deploying site"
 fi
@@ -174,7 +174,7 @@ if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_UR
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
    sudo touch "$ENV_FILE_DEPLOY_PATH"
    ENVTEMPLATE=$(curl -L "$ENV_TEMPLATE_URL")
-   echo "$ENVTEMPLATE"
+   #echo "$ENVTEMPLATE"
    cat "$ENVTEMPLATE" >> "$ENV_FILE_DEPLOY_PATH"
 
    echo "configuring app .env file"
