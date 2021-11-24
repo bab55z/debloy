@@ -77,7 +77,7 @@ ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v$laravel_ve
 ENV_FILE_DEPLOY_PATH="$WEB_FOLDER/.env"
 LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
 
-# CREATE GIT BARE REPO
+#== CREATE GIT BARE REPO
 echo "initializing git bare repository"
 # shellcheck disable=SC2164
 cd "$git_bare_root_folder"
@@ -102,7 +102,7 @@ echo "configuring git post receive hook done"
 echo "add the remote git bare repository with the following git command "
 echo "git remote add production ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER"
 
-# CREATE WED FOLDER
+#=== CREATE WED FOLDER
 echo "creating web folder"
 sudo mkdir "$WEB_FOLDER"
 echo "creating web folder done OK"
@@ -123,7 +123,7 @@ sudo setfacl -R -m u:"${server_username}":rwx "$WEB_FOLDER"
 echo "giving admin user proper permissions to web folder done"
 
 
-# CREATE NGINX HOST FILE
+#=== CREATE NGINX HOST FILE
 echo "creating nginx host file"
 sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
@@ -148,7 +148,7 @@ else
 fi
 echo "testing nginx configuration done"
 
-# CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
+#=== CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
 echo "setting up database"
 if [ -d "/var/lib/mysql/$database_dbname" ] ; then
    echo "a database with the same name ($database_dbname) already exists, cannot create database"
@@ -169,7 +169,7 @@ MYSQL_SCRIPT
   fi
 fi
 
-# ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
+#=== ADD .ENV FILE TO WEB FOLDER WITH CORRESPONDING
 echo "setting up app .env file"
 #if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
 if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_URL" | grep "200" > /dev/null; then
