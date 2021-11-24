@@ -60,7 +60,6 @@ create_variables $DEBLOYYAMLFILE
 #variables
 echo "initializing variables"
 D_ENV=${environment,,}
-WEB_FOLDER="${webserver_folder}"
 
 DEPLOY_GIT_FOLDER="$git_bare_root_folder/$git_bare_repo_name"
 
@@ -74,8 +73,8 @@ NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v$laravel_version/.env.example"
-ENV_FILE_DEPLOY_PATH="$WEB_FOLDER/.env"
-LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${WEB_FOLDER}/.appkey_notgenerated"
+ENV_FILE_DEPLOY_PATH="${webserver_folder}/.env"
+LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH="${webserver_folder}/.appkey_notgenerated"
 
 #== CREATE GIT BARE REPO
 echo "initializing git bare repository"
@@ -94,7 +93,7 @@ echo "setting up git post receive hook done OK"
 # configure post-receive hook
 echo "configuring git post receive hook"
 bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
-sed -i "s=WEBDIRVALUE=${WEB_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=WEBDIRVALUE=${webserver_folder}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
@@ -104,22 +103,22 @@ echo "git remote add production ssh://$server_username@$server_hostname$DEPLOY_G
 
 #=== CREATE WED FOLDER
 echo "creating web folder"
-sudo mkdir "$WEB_FOLDER"
+sudo mkdir "$webserver_folder"
 echo "creating web folder done OK"
 
 # SET WEB FOLDER OWNER TO WWW-DATA
 echo "setting web folder owner to www-data"
-sudo chown -R www-data:www-data "$WEB_FOLDER"
+sudo chown -R www-data:www-data "$webserver_folder"
 echo "setting web folder owner to www-data done OK"
 
 # SET PROPER WEB FOLDER PERMISSIONS
 echo "setting proper web folder permissions"
-setfacl -R -m u:"$server_username":rwx "$WEB_FOLDER"
+setfacl -R -m u:"$server_username":rwx "$webserver_folder"
 echo "setting proper web folder permissions done"
 
 # GIVE ADMIN USER PERMISSIONS
 echo "giving admin user proper permissions to web folder"
-sudo setfacl -R -m u:"${server_username}":rwx "$WEB_FOLDER"
+sudo setfacl -R -m u:"${server_username}":rwx "$webserver_folder"
 echo "giving admin user proper permissions to web folder done"
 
 
@@ -131,7 +130,7 @@ echo "creating nginx host file done OK"
 
 echo "configuring nginx host file"
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
-sudo sed -i "s=ROOTDIRVALUE=${WEB_FOLDER}/public=" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s=ROOTDIRVALUE=${webserver_folder}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
 echo "configuring nginx host file OK"
 
@@ -163,6 +162,7 @@ MYSQL_SCRIPT
   #Import database if provided
   if [ -f "$DBDUMPFILE" ]; then
     echo "importing database"
+    #sudo mysql -u root "$database_dbname" < "$DBDUMPFILE"
     mysql -u "$database_user" -p"$database_password" "$database_dbname" < "$DBDUMPFILE"
   else
     echo "database dump file not provided or wrong path, not importing database"
@@ -174,10 +174,11 @@ echo "setting up app .env file"
 #if curl -s --head  --request GET "$ENV_TEMPLATE_URL" | grep "200 OK" > /dev/null; then
 if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_URL" | grep "200" > /dev/null; then
    echo ".env.example template found for laravel version (${laravel_version}), retrieving it an updating it"
+   echo "creating $ENV_FILE_DEPLOY_PATH"
    sudo touch "$ENV_FILE_DEPLOY_PATH"
    ENVTEMPLATE=$(curl -L "$ENV_TEMPLATE_URL")
    #echo "$ENVTEMPLATE"
-   cat "$ENVTEMPLATE" >> "$ENV_FILE_DEPLOY_PATH"
+   echo "$ENVTEMPLATE" > "$ENV_FILE_DEPLOY_PATH"
 
    echo "configuring app .env file"
    sed -i "s@APP_NAME=Laravel@APP_NAME=\"${site_name}\"@" "$ENV_FILE_DEPLOY_PATH"
