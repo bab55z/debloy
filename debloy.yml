@@ -6,6 +6,7 @@ laravel:
 server:
   hostname: server3.boissy.williems.com
   username: bab55z #remote server user name
+  email: bab55z@yahoo.fr
 php:
   fpm-sock: unix:/var/run/php7-fpm.sock
 database:

@@ -141,7 +141,12 @@ if sudo nginx -t 2>&1 | grep 'successful'; then
    echo "Nginx config is ok, deploying site and restarting service"
    sudo ln -s "$NGINX_HOST_FILE_PATH" $NGINX_ENABLED_SITES_PATH
    sudo service nginx stop && sudo service nginx start
-   echo "Site enabled OK"
+   echo "enabled site OK"
+
+   echo "setting up ssl certificate via certbot"
+   sudo bash -c "sudo certbot run -n --nginx --agree-tos -d $MAIN_DOMAIN_NAME -m ${server_email} --redirect --no-eff-email"
+   echo "SSL certificate setup done"
+
 else
    echo "Nginx config is not ok, not deploying site"
 fi
