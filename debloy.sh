@@ -111,16 +111,10 @@ echo "setting web folder owner to www-data"
 sudo chown -R www-data:www-data "$webserver_folder"
 echo "setting web folder owner to www-data done OK"
 
-# SET PROPER WEB FOLDER PERMISSIONS
-echo "setting proper web folder permissions"
-setfacl -R -m u:"$server_username":rwx "$webserver_folder"
-echo "setting proper web folder permissions done"
-
 # GIVE ADMIN USER PERMISSIONS
 echo "giving admin user proper permissions to web folder"
-sudo setfacl -R -m u:"${server_username}":rwx "$webserver_folder"
+sudo setfacl -R -m u:"$server_username":rwx "$webserver_folder"
 echo "giving admin user proper permissions to web folder done"
-
 
 #=== CREATE NGINX HOST FILE
 echo "creating nginx host file"
@@ -192,6 +186,12 @@ if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_UR
    sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${database_dbname}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_USERNAME=root/DB_USERNAME=${database_user}/" "$ENV_FILE_DEPLOY_PATH"
    sed -i "s/DB_PASSWORD=/DB_PASSWORD=${database_password}/" "$ENV_FILE_DEPLOY_PATH"
+
+   # GIVE ADMIN USER PERMISSIONS TO EDIT .ENV FILE
+   echo "giving admin user permissions to edit .env file"
+   sudo setfacl -m u:"$server_username":rwx "$ENV_FILE_DEPLOY_PATH"
+   echo ".env file permissions to admin OK"
+
 
    #notify that laravel app key was not yet generated
    sudo touch "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
