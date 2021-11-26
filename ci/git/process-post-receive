@@ -106,7 +106,10 @@ cd $WEBDIRECTORY
 
 echo "Npm Packages"
 if [ "$COMPILEJS" = true ] ; then
+  MAIN_NODE_MODULES_PATH="$WEBDIRECTORY/node_modules"
   echo "Running Mix tasks"
+  echo "base node_modules directory ($MAIN_NODE_MODULES_PATH) found, removing before npm install"
+  #rm -rf "$MAIN_NODE_MODULES_PATH"
   npm install
   npm run prod
 fi
