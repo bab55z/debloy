@@ -107,9 +107,14 @@ cd $WEBDIRECTORY
 echo "Npm Packages"
 if [ "$COMPILEJS" = true ] ; then
   MAIN_NODE_MODULES_PATH="$WEBDIRECTORY/node_modules"
+  MAIN_NODE_MODULES_JSONLOCK="$WEBDIRECTORY/package-lock.json"
+  MAIN_NODE_MODULES_YARNLOCK="$WEBDIRECTORY/yarn.lock"
   echo "Running Mix tasks"
   echo "base node_modules directory ($MAIN_NODE_MODULES_PATH) found, removing before npm install"
   rm -rf "$MAIN_NODE_MODULES_PATH"
+  echo "removing lock files before npm install ($MAIN_NODE_MODULES_JSONLOCK and $MAIN_NODE_MODULES_YARNLOCK)"
+  #rm "$MAIN_NODE_MODULES_JSONLOCK"
+  #rm "$MAIN_NODE_MODULES_YARNLOCK"
   npm install
   npm run prod
 fi
