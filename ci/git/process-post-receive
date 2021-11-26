@@ -133,10 +133,14 @@ if [[ -d $NOVACOMPONENTSPATH ]]; then
       if [[ -d $NODE_MODULES_PATH ]]; then
         echo "node_modules directory ($NODE_MODULES_PATH) found, removing before npm install"
         rm -rf "$NODE_MODULES_PATH"
+        echo "removing package-lock.json and yarn.lock if exists"
+        rm "$NODE_MODULES_PATH"/package-lock.json
+        rm "$NODE_MODULES_PATH"/yarn.lock
+        echo "forcing npm cache clear"
+        npm cache clear --force
       fi
 
       npm install
-      npm update
       npm run prod
     done
 else
