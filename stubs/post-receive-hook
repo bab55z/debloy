@@ -2,7 +2,7 @@
 
 echo "----Starting app git deployment by calling ci/git/process-post-receive----"
 
-DEBLOYROOTVALUE/ci/git/process-post-receive -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE 
+DEBLOYROOTVALUE/ci/git/process-post-receive -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE
 
 # uncomment below to compile laravel js components as well
-#ci/git/process-post-receive -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE --compile-js --remove-node-vendor
+#DEBLOYROOTVALUE/ci/git/process-post-receive -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE --compile-js --remove-node-vendor
