@@ -122,7 +122,7 @@ if [[ -d $NOVACOMPONENTSPATH ]]; then
     find "$NOVACOMPONENTSPATH" -maxdepth 1 -mindepth 1 -type d | while read dir; do
       #Compile each component
       echo "Compiling nova component located at $dir"
-      cd "$WEBDIRECTORY/$dir"
+      cd "$dir"
       composer install --no-dev
       npm install
       npm run prod
