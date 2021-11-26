@@ -111,43 +111,44 @@ if [ "$COMPILEJS" = true ] ; then
   npm run prod
 fi
 
+## TOO MANY BUGS CURRENTLY WITH NOVA COMPONENTS STUCKED TO LARAVEL-MIX 1.0.0
+## IT IS ADVISED TO BUILD COMPONENT MANUALLY AND LOCALLY FOR PRODUCTION BEFORE COMMITING AND PUSHING TO GIT
 #Compile local Nova components
-echo "Compiling Nova components"
-NOVACOMPONENTSPATH="$WEBDIRECTORY/$NOVACOMPONENTSFOLDER"
-
-if [[ -d $NOVACOMPONENTSPATH ]]; then
-    echo "nova components directory ($NOVACOMPONENTSPATH) found, starting nova components compilation"
-
-    #list of components to compile
-    find "$NOVACOMPONENTSPATH" -maxdepth 1 -mindepth 1 -type d | while read dir; do
-      #Compile each component
-      echo "Compiling nova component located at $dir"
-      cd "$dir"
-      echo "running composer for current component ($NOVACOMPONENTSPATH)"
-      composer install --no-dev
-      composer update --no-dev
-      echo "running npm for current component ($NOVACOMPONENTSPATH)"
-
-      #remove node_modules if exists
-      NODE_MODULES_PATH="$dir/node_modules"
-      if [[ -d $NODE_MODULES_PATH ]]; then
-        echo "node_modules directory ($NODE_MODULES_PATH) found, removing before npm install"
-        rm -rf "$NODE_MODULES_PATH"
-        echo "removing package-lock.json and yarn.lock if exists"
-        rm "$NODE_MODULES_PATH"/package-lock.json
-        rm "$NODE_MODULES_PATH"/yarn.lock
-        echo "forcing npm cache clear"
-        npm cache clear --force
-      fi
-
-      npm install
-      npm run prod
-    done
-else
-    echo "nova components directory ($NOVACOMPONENTSPATH) not found, skipping Nova components compilation"
-fi
-
-cd $WEBDIRECTORY
+#echo "Compiling Nova components"
+#NOVACOMPONENTSPATH="$WEBDIRECTORY/$NOVACOMPONENTSFOLDER"
+#
+#if [[ -d $NOVACOMPONENTSPATH ]]; then
+#    echo "nova components directory ($NOVACOMPONENTSPATH) found, starting nova components compilation"
+#
+#    #list of components to compile
+#    find "$NOVACOMPONENTSPATH" -maxdepth 1 -mindepth 1 -type d | while read dir; do
+#      #Compile each component
+#      echo "Compiling nova component located at $dir"
+#      cd "$dir"
+#      echo "running composer for current component ($NOVACOMPONENTSPATH)"
+#      composer install --no-dev
+#      composer update --no-dev
+#      echo "running npm for current component ($NOVACOMPONENTSPATH)"
+#
+#      #remove node_modules if exists
+#      NODE_MODULES_PATH="$dir/node_modules"
+#      if [[ -d $NODE_MODULES_PATH ]]; then
+#        echo "node_modules directory ($NODE_MODULES_PATH) found, removing before npm install"
+#        rm -rf "$NODE_MODULES_PATH"
+#        echo "removing package-lock.json and yarn.lock if exists"
+#        rm "$NODE_MODULES_PATH"/package-lock.json
+#        rm "$NODE_MODULES_PATH"/yarn.lock
+#        echo "forcing npm cache clear"
+#        npm cache clear --force
+#      fi
+#
+#      npm install
+#      npm run prod
+#    done
+#else
+#    echo "nova components directory ($NOVACOMPONENTSPATH) not found, skipping Nova components compilation"
+#fi
+#cd $WEBDIRECTORY
 
 #echo "Updating composer (Optional)"
 #composer self-update
