@@ -125,8 +125,18 @@ if [[ -d $NOVACOMPONENTSPATH ]]; then
       cd "$dir"
       echo "running composer for current component ($NOVACOMPONENTSPATH)"
       composer install --no-dev
+      composer update --no-dev
       echo "running npm for current component ($NOVACOMPONENTSPATH)"
+
+      #remove node_modules if exists
+      NODE_MODULES_PATH="$dir/node_modules"
+      if [[ -d $NODE_MODULES_PATH ]]; then
+        echo "node_modules directory ($NODE_MODULES_PATH) found, removing before npm install"
+        #rm -rf "$NODE_MODULES_PATH"
+      fi
+
       npm install
+      npm update
       npm run prod
     done
 else
