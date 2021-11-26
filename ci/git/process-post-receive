@@ -123,7 +123,9 @@ if [[ -d $NOVACOMPONENTSPATH ]]; then
       #Compile each component
       echo "Compiling nova component located at $dir"
       cd "$dir"
+      echo "running composer for current component ($NOVACOMPONENTSPATH)"
       composer install --no-dev
+      echo "running npm for current component ($NOVACOMPONENTSPATH)"
       npm install
       npm run prod
     done
