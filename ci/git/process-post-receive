@@ -201,6 +201,10 @@ fi
 echo "setting proper permissions"
 sudo $DEBLOYROOT/ci/set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME"
 
+echo "Restarting install queue workers"
+php artisan queue:restart
+echo "Restart queues OK"
+
 echo "Deployment finished!"
 
 exit 0
