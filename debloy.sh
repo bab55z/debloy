@@ -27,7 +27,9 @@ while (( "$#" )); do
       fi
       ;;
     -h|--help)
-      echo -e "\n\n\t\t----Debloy Help----\n"
+      echo -e "\n\n\t\t\t\t----Debloy Help----\n"
+      echo -e "\t IMPORTANT NOTICE: move to debloy script root folder before running debloy.sh  \n"
+      echo -e "\t run debloy.sh with sudo (sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql)  \n"
       echo -e "\t-y, --yaml-file \t\t  config yaml file\n\t-d, --database-dump-file \t  database dump file"
       echo -e "\n\n"
       exit 0
