@@ -144,7 +144,7 @@ if sudo nginx -t 2>&1 | grep 'successful'; then
    echo "SSL certificate setup done"
 
 else
-   echo "Nginx config is not ok, not deploying site"
+   echo "Nginx config is not ok, not deploying site and not setting up ssl certificate"
 fi
 echo "testing nginx configuration done"
 
