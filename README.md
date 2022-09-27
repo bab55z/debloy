@@ -1,8 +1,16 @@
 # Debloy
-Laravel app deployment made easy with automated environment setup
+Laravel app deployment made easy with automated environment setup. 
 
-# Usage
+This script, when run, will perform the following actions on your server
 
+- Create the web folder for your app
+- Create a database for your app
+- Create and configure a Nginx host file to server the app
+- Create and configure a git-bare repository on the server for the app to manage your code deployments continuously
+- Create and configure a post-receive git hooks for the git-bare repository to handle your code deployments (_file permissions,mix compilation, composer packages install updates, code clean up, caching, various post deployments optimization..._)
+- Automatically install Let's Encrypt SSL certificate for your app
+
+# General information
 **Recommended steps**
 
 - Initial run to set up the full environment
@@ -11,15 +19,18 @@ Laravel app deployment made easy with automated environment setup
 add the remote git bare repository with the following git command 
 git remote add production ssh://username@server.domain.com/repositories/debloy.com.git
 ```
-- Make your first push to the server from your local code base to deploy your code. _Only performed for the first push, Debloy will detect the push and execute the laravel command to generate the app key_.
+- Make your first push to the server from your local code base to deploy your code. _Only for the first push, Debloy will detect the push and execute the laravel command to generate the app key_.
 - After the initial push, you need to update the .env file of the new environment accordingly to your requirements.
 - Voilà! enjoy your newly created app.
 
-**Important notice:** 
+**Important notice:**
 
-as of now, you need to move to the folder where debloy script is installed (the folder containing `debloy.sh`).  
+As of now, you need to move to the folder where debloy script is installed (the folder containing `debloy.sh`).
 
-You must also run debloy.sh with sudo 
+You must also run debloy.sh with sudo
+
+# Usage
+**Running debloy.sh**
 
 `sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
 
@@ -27,6 +38,7 @@ You must also run debloy.sh with sudo
 
 	-y or --yaml-file 		  the 'debloyment' yaml config file
 	-d or --database-dump-file 	  database dump file
+	-h or --help 	                  View the help 
 
 **'debloyment' yaml config file example**
 
