@@ -9,6 +9,8 @@ This script, when run, will perform the following actions on your server
 - Create and configure a git-bare repository on the server for the app to manage your code deployments continuously
 - Create and configure a post-receive git hooks for the git-bare repository to handle your code deployments (_file permissions,mix compilation, composer packages install updates, code clean up, caching, various post deployments optimization..._)
 - Automatically install Let's Encrypt SSL certificate for your app
+- Temporarily give granular permissions to the unix user in charge of the app maintenance only when deploying and removed after deployment
+- Properly manage the app files access permissions for best security
 
 # General information
 **Recommended steps**
