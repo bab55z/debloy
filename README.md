@@ -10,6 +10,18 @@ You must also run debloy.sh with sudo
 
 `sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
 
+**Recommended steps**
+
+- Initial run to set up the full environment
+- After the initial run, add the newly created git-bare repo to your code source, the exact command to do this will be displayed like following after the initial run
+```
+add the remote git bare repository with the following git command 
+git remote add production ssh://username@server.domain.com/repositories/debloy.com.git
+```
+- Make your first push to the server from your local code base to deploy your code. _Only performed for the first push, Debloy will detect the push and execute the laravel command to generate the app key_.
+- After the initial push, you need to update the .env file of the new environment accordingly to your requirements.
+- Voilà! enjoy your newly created app.
+
 **Parameters**
 
 	-y or --yaml-file 		  the 'debloyment' yaml config file

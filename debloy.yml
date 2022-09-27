@@ -5,8 +5,8 @@ laravel:
   version: 9.0.0 #full laravel version e.g. 8.0.1, used to retrieve latest .env.example,...
 server:
   hostname: server.domain.com
-  username: coolboy #remote server user name
-  email: coolboy@domain.com
+  username: username #remote server user name
+  email: username@domain.com
 php:
   fpm-sock: unix:/var/run/php8.1-fpm.sock
 database:
