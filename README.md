@@ -17,12 +17,22 @@ This script, when run, will perform the following actions on your server
 
 - Initial run to set up the full environment
 - After the initial run, add the newly created git-bare repo to your code source, the exact command to do this will be displayed like following after the initial run
-```
-add the remote git bare repository with the following git command 
-git remote add production ssh://username@server.domain.com/repositories/debloy.com.git
-```
+    ```
+  add the remote git bare repository with the following git command 
+  git remote add production ssh://username@server.domain.com/repositories/debloy.com.git
+  ```
 - Make your first push to the server from your local code base to deploy your code. _Only for the first push, Debloy will detect the push and execute the laravel command to generate the app key_.
 - After the initial push, you need to update the .env file of the new environment accordingly to your requirements.
+- If after the above steps your app has errors, try to clean and refresh your app caches with following commands
+
+  ```php artisan route:clear```
+
+  ```php artisan config:clear```
+
+  ```php artisan view:clear```
+
+  ```php artisan cache:clear```
+
 - Voilà! enjoy your newly created app.
 
 **Important notice:**
