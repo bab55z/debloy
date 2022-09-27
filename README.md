@@ -2,13 +2,6 @@
 Laravel app deployment made easy with automated environment setup
 
 # Usage
-**Important notice:** 
-
-as of now, you need to move to the folder where debloy script is installed (the folder containing `debloy.sh`).  
-
-You must also run debloy.sh with sudo 
-
-`sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
 
 **Recommended steps**
 
@@ -21,6 +14,14 @@ git remote add production ssh://username@server.domain.com/repositories/debloy.c
 - Make your first push to the server from your local code base to deploy your code. _Only performed for the first push, Debloy will detect the push and execute the laravel command to generate the app key_.
 - After the initial push, you need to update the .env file of the new environment accordingly to your requirements.
 - Voilà! enjoy your newly created app.
+
+**Important notice:** 
+
+as of now, you need to move to the folder where debloy script is installed (the folder containing `debloy.sh`).  
+
+You must also run debloy.sh with sudo 
+
+`sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
 
 **Parameters**
 
