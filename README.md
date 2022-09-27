@@ -13,7 +13,6 @@ You must also run debloy.sh with sudo
 **Parameters**
 
 	-y or --yaml-file 		  the 'debloyment' yaml config file
-  
 	-d or --database-dump-file 	  database dump file
 
 **'debloyment' yaml config file example**
