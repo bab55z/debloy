@@ -82,6 +82,9 @@ php:
   fpm-sock: unix:/var/run/php8.1-fpm.sock
 database:
   type: mysql #mysql
+  admin: #database admin credentials
+    user: root # the database admin username with all privileges
+    password: $$secured@password12345## # the database admin password
   dbname: laravel # the database name
   user: laravel # the database username
   password: $$secured@password12345## # the database password
@@ -104,4 +107,19 @@ webserver:
     enabled: true # if true, enables ssl for the app
     letsencrypt: true # it true, automatically requests and sets up ssl from Let's Encrypt authority
 compile-javascript: true # if true, compiles your mix config
+```
+**Security & safety**
+
+After successfully running the script, do not forget to delete the yaml config file for security reasons.
+
+If you do not want to delete the file, you should remove sensitive information like the database admin credentials and the app database credentials.
+```yaml
+database:
+  type: mysql #mysql
+  admin: #database admin credentials
+    user: root # the database admin username with all privileges
+    password: $$secured@password12345## # the database admin password
+  dbname: laravel # the database name
+  user: laravel # the database username
+  password: $$secured@password12345## # the database password
 ```
