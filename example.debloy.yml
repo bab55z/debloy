@@ -10,6 +10,9 @@ server:
 php:
   fpm-sock: unix:/var/run/php8.1-fpm.sock
 database:
+  admin: #database admin credentials
+    user: root # the database admin username with all privileges
+    password: $$secured@password12345## # the database admin password
   type: mysql #mysql
   dbname: laravel # the database name
   user: laravel # the database username

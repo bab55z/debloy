@@ -46,6 +46,7 @@ You must also run debloy.sh with sudo
 - A linux server with ssh access
 - A domain name pointing to the server
 - A database server running on the server
+  - you'll need to provide and admin user with the right to create new databases
 - A database dump file of your app database (optional)
 - git installed on the server
 - php FPM installed on the server (socks path must be specified in the yaml config file)

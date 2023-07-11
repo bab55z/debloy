@@ -175,7 +175,7 @@ if [ -d "/var/lib/mysql/$database_dbname" ] ; then
    echo -e "${Yellow}Warning${NoColor}: a database with the same name ($database_dbname) already exists, cannot create database"
 else
    echo "creating database with name ($database_dbname)"
-   sudo mysql -u root <<MYSQL_SCRIPT
+   sudo mysql -u "$database_admin_user" -p"$database_admin_password" <<MYSQL_SCRIPT
    CREATE DATABASE $database_dbname;
    CREATE USER '$database_user'@'%' IDENTIFIED BY '$database_password';
    GRANT ALL PRIVILEGES ON $database_dbname.* TO '$database_user'@'%';
