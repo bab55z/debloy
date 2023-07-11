@@ -1,5 +1,26 @@
 #!/bin/bash
 
+NoColor='\033[0m'       # Text Reset
+# Regular Colors
+Black='\033[0;30m'        # Black
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
+# Bold
+BBlack='\033[1;30m'       # Black
+BRed='\033[1;31m'         # Red
+BGreen='\033[1;32m'       # Green
+BYellow='\033[1;33m'      # Yellow
+BBlue='\033[1;34m'        # Blue
+BPurple='\033[1;35m'      # Purple
+BCyan='\033[1;36m'        # Cyan
+BWhite='\033[1;37m'       # White
+
 DEBLOYROOT="/var/repo/debloy"
 DEBLOYYAMLFILE="debloy.yml"
 DBDUMPFILE=
@@ -13,7 +34,7 @@ while (( "$#" )); do
         DEBLOYYAMLFILE=$2
         shift 2
       else
-        echo "Error: web directory argument for $1 is missing" >&2
+        echo -e "${Red}Error${NoColor}: web directory argument for $1 is missing" >&2
         exit 1
       fi
       ;;
@@ -22,7 +43,7 @@ while (( "$#" )); do
         DBDUMPFILE=$2
         shift 2
       else
-        echo "Error: git directory argument for $1 is missing" >&2
+        echo -e "${Red}Error${NoColor}: git directory argument for $1 is missing" >&2
         exit 1
       fi
       ;;
@@ -35,7 +56,7 @@ while (( "$#" )); do
       exit 0
       ;;
     -*|--*=) # unsupported flags
-      echo "Error: Unsupported flag $1" >&2
+      echo -e "${Red}Error${NoColor}: Unsupported flag $1" >&2
       exit 1
       ;;
     *) # preserve positional arguments
@@ -84,13 +105,13 @@ echo "initializing git bare repository"
 cd "$git_bare_root_folder"
 git init --bare "$git_bare_repo_name"
 setfacl -R -m u:"$server_username":rwx "$DEPLOY_GIT_FOLDER"
-echo "initializing git bare repository done"
+echo -e "initializing git bare repository ${Cyan}done${NoColor}"
 
 # SET UP GIT POST-RECEIVE HOOK DEPLOYMENT
 echo "setting up git post receive hook"
 touch "$POST_RECEIVE_HOOK_PATH"
 sudo chmod +x "$POST_RECEIVE_HOOK_PATH"
-echo "setting up git post receive hook done OK"
+echo -e "setting up git post receive hook ${Cyan}done${NoColor}"
 
 # configure post-receive hook
 echo "configuring git post receive hook"
@@ -99,36 +120,36 @@ sed -i "s=WEBDIRVALUE=${webserver_folder}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
-echo "configuring git post receive hook done"
+echo -e "configuring git post receive hook ${Cyan}done${NoColor}"
 echo "add the remote git bare repository with the following git command "
-echo "git remote add production ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER"
+echo -e "git remote add production ${BYellow}ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER ${NoColor} "
 
 #=== CREATE WED FOLDER
 echo "creating web folder"
 sudo mkdir "$webserver_folder"
-echo "creating web folder done OK"
+echo -e "creating web folder ${Cyan}done${NoColor}"
 
 # SET WEB FOLDER OWNER TO WWW-DATA
 echo "setting web folder owner to www-data"
 sudo chown -R www-data:www-data "$webserver_folder"
-echo "setting web folder owner to www-data done OK"
+echo -e "setting web folder owner to www-data ${Cyan}done${NoColor}"
 
 # GIVE ADMIN USER PERMISSIONS
 echo "giving admin user proper permissions to web folder"
 sudo setfacl -R -m u:"$server_username":rwx "$webserver_folder"
-echo "giving admin user proper permissions to web folder done"
+echo -e "giving admin user proper permissions to web folder ${Cyan}done${NoColor}"
 
 #=== CREATE NGINX HOST FILE
 echo "creating nginx host file"
 sudo touch "$NGINX_HOST_FILE_PATH"
 sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
-echo "creating nginx host file done OK"
+echo -e "creating nginx host file ${Cyan}done${NoColor}"
 
 echo "configuring nginx host file"
 sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${webserver_folder}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
-echo "configuring nginx host file OK"
+echo -e "configuring nginx host file ${Cyan}done${NoColor}"
 
 # TEST NGINX, activate hosts AND RESTART SERVICE
 echo "testing nginx configuration"
@@ -137,21 +158,21 @@ if sudo nginx -t 2>&1 | grep 'successful'; then
    echo "Nginx config is ok, deploying site and restarting service"
    sudo ln -s "$NGINX_HOST_FILE_PATH" $NGINX_ENABLED_SITES_PATH
    sudo service nginx stop && sudo service nginx start
-   echo "enabled site OK"
+   echo -e "enabled site ${Cyan}done${NoColor}"
 
    echo "setting up ssl certificate via certbot"
    sudo bash -c "sudo certbot run -n --nginx --agree-tos -d $MAIN_DOMAIN_NAME -m ${server_email} --redirect --no-eff-email"
-   echo "SSL certificate setup done"
+   echo -e "SSL certificate setup ${Cyan}done${NoColor}"
 
 else
-   echo "Nginx config is not ok, not deploying site and not setting up ssl certificate"
+   echo -e "${Red}Error${NoColor}: Nginx config is not ok, not deploying site and not setting up ssl certificate"
 fi
-echo "testing nginx configuration done"
+echo -e "testing nginx configuration ${Cyan}done${NoColor}"
 
 #=== CREATE DATABASE, CREATE DATABASE USERNAME AND SET PASSWORD
 echo "setting up database"
 if [ -d "/var/lib/mysql/$database_dbname" ] ; then
-   echo "a database with the same name ($database_dbname) already exists, cannot create database"
+   echo -e "${Yellow}Warning${NoColor}: a database with the same name ($database_dbname) already exists, cannot create database"
 else
    echo "creating database with name ($database_dbname)"
    sudo mysql -u root <<MYSQL_SCRIPT
@@ -166,7 +187,7 @@ MYSQL_SCRIPT
     #sudo mysql -u root "$database_dbname" < "$DBDUMPFILE"
     mysql -u "$database_user" -p"$database_password" "$database_dbname" < "$DBDUMPFILE"
   else
-    echo "database dump file not provided or wrong path, not importing database"
+    echo -e "${Red}Error${NoColor}: database dump file not provided or wrong path, not importing database"
   fi
 fi
 
@@ -192,12 +213,11 @@ if curl --write-out '%{http_code}' --silent --output /dev/null "$ENV_TEMPLATE_UR
    # GIVE ADMIN USER PERMISSIONS TO EDIT .ENV FILE
    echo "giving admin user permissions to edit .env file"
    sudo setfacl -m u:"$server_username":rwx "$ENV_FILE_DEPLOY_PATH"
-   echo ".env file permissions to admin OK"
-
+   echo -e ".env file permissions to admin ${Cyan}done${NoColor}"
 
    #notify that laravel app key was not yet generated
    sudo touch "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH"
-   echo "setting up app .env file done"
+   echo -e "setting up app .env file ${Cyan}done${NoColor}"
 else
-   echo ".env.example template of provided laravel version(${laravel_version}) could not be retrieved from (${ENV_TEMPLATE_URL})"
+   echo -e "${Red}Error${NoColor}: .env.example template of provided laravel version(${laravel_version}) could not be retrieved from (${ENV_TEMPLATE_URL})"
 fi

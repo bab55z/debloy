@@ -42,6 +42,19 @@ As of now, you need to move to the folder where debloy script is installed (the 
 You must also run debloy.sh with sudo
 
 # Usage
+**Requirements**
+- A linux server with ssh access
+- A domain name pointing to the server
+- A database server running on the server
+- A database dump file of your app database (optional)
+- git installed on the server
+- php FPM installed on the server (socks path must be specified in the yaml config file)
+- nginx installed on the server
+- composer installed on the server
+- setfacl command installed on the server
+  - `sudo apt-get install acl` on debian/ubuntu
+
+
 **Running debloy.sh**
 
 `sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
