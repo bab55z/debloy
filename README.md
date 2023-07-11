@@ -115,11 +115,13 @@ After successfully running the script, do not forget to delete the yaml config f
 If you do not want to delete the file, you should remove sensitive information like the database admin credentials and the app database credentials.
 ```yaml
 database:
-  type: mysql #mysql
+  type: #mysql
   admin: #database admin credentials
-    user: root # the database admin username with all privileges
-    password: $$secured@password12345## # the database admin password
-  dbname: laravel # the database name
-  user: laravel # the database username
-  password: $$secured@password12345## # the database password
+    user: # the database admin username with all privileges
+    password: # the database admin password
+  dbname: # the database name
+  user: # the database username
+  password: # the database password
 ```
+
+Thanks!
