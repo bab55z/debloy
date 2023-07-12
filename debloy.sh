@@ -122,7 +122,7 @@ sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
 echo -e "configuring git post receive hook ${Cyan}done${NoColor}"
 echo "add the remote git bare repository with the following git command "
-echo -e "git remote add production ${BYellow}ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER ${NoColor} "
+echo -e "${BYellow}git remote add production ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER ${NoColor} "
 
 #=== CREATE WED FOLDER
 echo "creating web folder"
