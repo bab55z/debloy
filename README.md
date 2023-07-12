@@ -56,9 +56,20 @@ You must also run debloy.sh with sudo
   - `sudo apt-get install acl` on debian/ubuntu
 
 
-**Running debloy.sh**
+**Installation & Running debloy.sh**
+- clone this repository on your server 
+  
+  ```git clone https://github.com/bab55z/debloy.git```
 
-`sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
+- move to the folder where debloy script is installed (the folder containing `debloy.sh`)
+
+  ```cd debloy```
+
+- configure your yaml config file (see example below)
+
+- run debloy.sh with sudo
+
+  `sudo debloy.sh -y stage-site-debloy.yml -d database-dump-file.sql` 
 
 **Parameters**
 
