@@ -93,7 +93,7 @@ DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 POST_RECEIVE_HOOK_PATH="${git_bare_repo_name}/hooks/post-receive"
 POST_RECEIVE_HOOK_SCRIPT_PATH="${git_bare_repo_name}/hooks/post-receive-script"
 FOLDER_PERMISSIONS_SCRIPT_PATH="${git_bare_repo_name}/hooks/set-webfolder-permissions"
-SUDOERS_PERMISSIONS_PATH="/etc/sudoers.d/${git_bare_repo_name}_folder_permission_script"
+SUDOERS_PERMISSIONS_PATH="/etc/sudoers.d/${git_bare_repo_name//.}_folder_permission_script"
 
 NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
