@@ -66,7 +66,7 @@ You must also run debloy.sh with sudo
 
   ```cd debloy```
 
-- configure your yaml config file (see example below)
+- configure your yaml config file (see example below), it's advised to avoid using spaces in the file and folder names. Spaces are accepted in the composer command (```composer-command```) config although.
 
 - run debloy.sh with sudo
 

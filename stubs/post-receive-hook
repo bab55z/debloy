@@ -2,7 +2,7 @@
 
 echo "----Starting app git deployment by calling ./hooks/post-receive-script----"
 
-./hooks/post-receive-script -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE -p PHPEXECUTABLEVALUE -k COMPOSERCOMMANDVALUE -x WEBSERVERUSERVALUE -v WEBSERVERUSERGROUPVALUE
+./hooks/post-receive-script -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE -p PHPEXECUTABLEVALUE -k "COMPOSERCOMMANDVALUE" -x WEBSERVERUSERVALUE -v WEBSERVERUSERGROUPVALUE
 
 # add below modifiers to compile laravel js components as well
 # --compile-js --remove-node-vendor
