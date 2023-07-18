@@ -144,6 +144,7 @@ sed -i "s=WEBSERVERUSERGROUPVALUE=${webserver_user_group}=" "$POST_RECEIVE_HOOK_
 # sudoers permission for set-webfolder-permissions script: allows running the script as root without password
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$SUDOERS_PERMISSIONS_PATH"
 sed -i "s=FOLDERPERMISSIONSSCRIPTPATHVALUE=${git_bare_root_folder}/${FOLDER_PERMISSIONS_SCRIPT_PATH}=" "$SUDOERS_PERMISSIONS_PATH"
+sed -i "s=FOLDERPERMISSIONSSCRIPTPATHVALUE=${git_bare_root_folder}/${FOLDER_PERMISSIONS_SCRIPT_PATH}=" "$POST_RECEIVE_HOOK_SCRIPT_PATH"
 
 echo -e "configuring git post receive hook ${Cyan}done${NoColor}"
 echo "add the remote git bare repository with the following git command "
