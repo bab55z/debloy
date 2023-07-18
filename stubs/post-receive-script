@@ -264,7 +264,7 @@ fi
 
 #set proper permissions on files
 echo "setting proper permissions"
-sudo ./set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME" "$WEBSERVERUSER" "$WEBSERVERUSERGROUP"
+sudo ./hooks/set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME" "$WEBSERVERUSER" "$WEBSERVERUSERGROUP"
 
 echo "Restarting queue workers"
 #php artisan queue:restart
