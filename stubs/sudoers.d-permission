@@ -1,0 +1,3 @@
+#allows running the set-webfolder-permissions script commands without password for the laravel app admin user
+
+ADMINUSERNAMEVALUE ALL=(ALL) NOPASSWD: FOLDERPERMISSIONSSCRIPTPATHVALUE

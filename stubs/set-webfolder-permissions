@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#run this script as root user
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root user"
+   exit 1
+fi
+
 WEBFOLDER=$1
 ADMINUSERNAME=$2
 WEBSERVERUSER=$3
@@ -29,17 +35,17 @@ fi
 #exit 0;
 
 #change web directory owner
-sudo chown -R $WEBSERVERUSER:$WEBSERVERUSERGROUP $WEBFOLDER
-sudo usermod -a -G $WEBSERVERUSERGROUP $ADMINUSERNAME
+chown -R $WEBSERVERUSER:$WEBSERVERUSERGROUP $WEBFOLDER
+usermod -a -G $WEBSERVERUSERGROUP $ADMINUSERNAME
 
 #set proper files permission
-sudo find $WEBFOLDER -type f -exec chmod 644 {} \;
+find $WEBFOLDER -type f -exec chmod 644 {} \;
 
 #set proper directories permission
-sudo find $WEBFOLDER -type d -exec chmod 755 {} \;
+find $WEBFOLDER -type d -exec chmod 755 {} \;
 
-sudo chgrp -R $WEBSERVERUSERGROUP "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
-sudo chmod -R ug+rwx "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
+chgrp -R $WEBSERVERUSERGROUP "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
+chmod -R ug+rwx "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
 
 #admin user permission
-sudo setfacl -R -m u:${ADMINUSERNAME}:rwx $WEBFOLDER
+setfacl -R -m u:${ADMINUSERNAME}:rwx $WEBFOLDER
