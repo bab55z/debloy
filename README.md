@@ -11,7 +11,7 @@ This script, when run, will perform the following actions on your server
 - Automatically install Let's Encrypt SSL certificate for your app
 - Temporarily give granular permissions to the unix user in charge of the app maintenance only when deploying and removed after deployment
 - Properly manage the app files access permissions for best security
-
+- add a file to the /etc/sudoers.d/ folder to allow  [set-webfolder-permissions](stubs%2Fset-webfolder-permissions) script file to set proper files and folders permissions after each future deployments
 # General information
 **Recommended steps**
 
