@@ -147,10 +147,10 @@ echo "creating web folder"
 sudo mkdir "$webserver_folder"
 echo -e "creating web folder ${Cyan}done${NoColor}"
 
-# SET WEB FOLDER OWNER TO WWW-DATA
-echo "setting web folder owner to www-data"
-sudo chown -R www-data:www-data "$webserver_folder"
-echo -e "setting web folder owner to www-data ${Cyan}done${NoColor}"
+# SET WEB FOLDER OWNER TO web server user
+echo "setting web folder owner to $webserver_user"
+sudo chown -R "$webserver_user":"$webserver_user_group" "$webserver_folder"
+echo -e "setting web folder owner to $webserver_user ${Cyan}done${NoColor}"
 
 # GIVE ADMIN USER PERMISSIONS
 echo "giving admin user proper permissions to web folder"

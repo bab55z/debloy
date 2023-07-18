@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "----Starting app git deployment by calling ci/git/process-post-receive----"
+echo "----Starting app git deployment by calling ./post-receive-script----"
 
 ./post-receive-script -w WEBDIRVALUE -g GITDIRVALUE -u ADMINUSERNAMEVALUE -p PHPEXECUTABLEVALUE -k COMPOSERCOMMANDVALUE -x WEBSERVERUSERVALUE -v WEBSERVERUSERGROUPVALUE
 

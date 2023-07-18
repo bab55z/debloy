@@ -49,6 +49,7 @@ You must also run debloy.sh with sudo
   - you'll need to provide an admin user with the right to create new databases
 - A database dump file of your app database (optional)
 - git installed on the server
+- php-cli installed on the server
 - php FPM installed on the server (socks path must be specified in the yaml config file)
 - nginx installed on the server
 - composer installed on the server
@@ -137,6 +138,29 @@ database:
   dbname: # the database name
   user: # the database username
   password: # the database password
+```
+
+**Bonus: recommended deployment architecture**
+
+this is a personal suggestion, feel free to user it or not.
+
+_Web folder_
+```
+-> Structure: /var/www/html/{environment}/{app-domain}
+Example1: /var/www/html/production/mysite.com #mysite.com in production environment
+Example2: /var/www/html/stage/mysite.com #mysite.com in staging environment
+```
+_Git bare repositories folder_
+```
+-> Structure repositories folder: /var/repo/{environment}/{app-domain}.git
+Example1: /var/repo/production/mysite.com.git #mysite.com in production environment
+Example2: /var/repo/stage/mysite.com.git #mysite.com in staging environment
+```
+_Nginx config folder_
+```
+-> Structure: /etc/nginx/sites-available/{environment}.{app-domain} (no environment for production)
+Example1: /etc/nginx/sites-available/mysite.com #mysite.com in production environment
+Example2: /etc/nginx/sites-available/stage.mysite.com #mysite.com in staging environment
 ```
 
 Thanks!
