@@ -91,6 +91,8 @@ MAIN_DOMAIN_NAME="$webserver_domain_name_main"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
 
 POST_RECEIVE_HOOK_PATH="${git_bare_repo_name}/hooks/post-receive"
+POST_RECEIVE_HOOK_SCRIPT_PATH="${git_bare_repo_name}/hooks/post-receive-script"
+FOLDER_PERMISSIONS_SCRIPT_PATH="${git_bare_repo_name}/hooks/set-webfolder-permissions"
 
 NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
@@ -109,17 +111,33 @@ echo -e "initializing git bare repository ${Cyan}done${NoColor}"
 
 # SET UP GIT POST-RECEIVE HOOK DEPLOYMENT
 echo "setting up git post receive hook"
+
 touch "$POST_RECEIVE_HOOK_PATH"
+touch "$POST_RECEIVE_HOOK_SCRIPT_PATH"
+touch "$FOLDER_PERMISSIONS_SCRIPT_PATH"
+
 sudo chmod +x "$POST_RECEIVE_HOOK_PATH"
+sudo chmod +x "$POST_RECEIVE_HOOK_SCRIPT_PATH"
+sudo chmod +x "$FOLDER_PERMISSIONS_SCRIPT_PATH"
+
 echo -e "setting up git post receive hook ${Cyan}done${NoColor}"
 
 # configure post-receive hook
 echo "configuring git post receive hook"
+
 bash -c "cat ${DEBLOYROOT}/stubs/post-receive-hook >> $POST_RECEIVE_HOOK_PATH"
+bash -c "cat ${DEBLOYROOT}/stubs/post-receive-script >> $POST_RECEIVE_HOOK_SCRIPT_PATH"
+bash -c "cat ${DEBLOYROOT}/stubs/set-webfolder-permissions >> $FOLDER_PERMISSIONS_SCRIPT_PATH"
+
 sed -i "s=WEBDIRVALUE=${webserver_folder}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=GITDIRVALUE=${DEPLOY_GIT_FOLDER}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=ADMINUSERNAMEVALUE=${server_username}=" "$POST_RECEIVE_HOOK_PATH"
 sed -i "s=DEBLOYROOTVALUE=${DEBLOYROOT}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=PHPEXECUTABLEVALUE=${php_executable}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=COMPOSERCOMMANDVALUE=${php_composer_command}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=WEBSERVERUSERVALUE=${webserver_user}=" "$POST_RECEIVE_HOOK_PATH"
+sed -i "s=WEBSERVERUSERGROUPVALUE=${webserver_user_group}=" "$POST_RECEIVE_HOOK_PATH"
+
 echo -e "configuring git post receive hook ${Cyan}done${NoColor}"
 echo "add the remote git bare repository with the following git command "
 echo -e "${BYellow}git remote add production ssh://$server_username@$server_hostname$DEPLOY_GIT_FOLDER ${NoColor} "

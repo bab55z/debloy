@@ -1,0 +1,45 @@
+#!/bin/bash
+
+WEBFOLDER=$1
+ADMINUSERNAME=$2
+WEBSERVERUSER=$3
+WEBSERVERUSERGROUP=$4
+
+if [[ -z $WEBFOLDER ]]; then
+    echo "web folder is required as first argument"
+    exit 1
+fi
+
+if [[ -z $ADMINUSERNAME ]]; then
+    echo "admin username is required as second argument"
+    exit 1
+fi
+
+if [[ -z $WEBSERVERUSER ]]; then
+    echo "web server user is required as third argument"
+    exit 1
+fi
+
+if [[ -z $WEBSERVERUSERGROUP ]]; then
+    echo "web server user group is required as fourth argument"
+    exit 1
+fi
+
+#echo "$WEBFOLDER"
+#exit 0;
+
+#change web directory owner
+sudo chown -R $WEBSERVERUSER:$WEBSERVERUSERGROUP $WEBFOLDER
+sudo usermod -a -G $WEBSERVERUSERGROUP $ADMINUSERNAME
+
+#set proper files permission
+sudo find $WEBFOLDER -type f -exec chmod 644 {} \;
+
+#set proper directories permission
+sudo find $WEBFOLDER -type d -exec chmod 755 {} \;
+
+sudo chgrp -R $WEBSERVERUSERGROUP "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
+sudo chmod -R ug+rwx "${WEBFOLDER}/storage" "${WEBFOLDER}/bootstrap/cache"
+
+#admin user permission
+sudo setfacl -R -m u:${ADMINUSERNAME}:rwx $WEBFOLDER

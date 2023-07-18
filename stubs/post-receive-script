@@ -54,6 +54,24 @@ while (( "$#" )); do
         exit 1
       fi
       ;;
+    -x|--webserver-user)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        WEBSERVERUSER=$2
+        shift 2
+      else
+        echo "Error: admin username argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
+    -v|--webserver-usergroup)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        WEBSERVERUSERGROUP=$2
+        shift 2
+      else
+        echo "Error: admin username argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
     -c|--compile-js)
       COMPILEJS=true
       shift
@@ -111,7 +129,10 @@ echo "----Starting app git deployment from process post receive script----"
 echo "Pushing $COMMIT to repository."
 echo "Suspending Application"
 cd $WEBDIRECTORY
-php artisan down
+
+#php artisan down
+downCommand="$PHPEXECUTABLE artisan down"
+$downCommand
 
 echo "Checking out latest"
 cd $GITDIRECTORY
@@ -152,8 +173,12 @@ fi
 #      echo "Compiling nova component located at $dir"
 #      cd "$dir"
 #      echo "running composer for current component ($NOVACOMPONENTSPATH)"
-#      composer install --no-dev
-#      composer update --no-dev
+#      #composer install --no-dev
+#      composerNovaInstallCommand="$COMPOSERCOMMAND install --no-dev"
+#      $composerNovaInstallCommand
+#      #composer update --no-dev
+#      composerNovaUpdateCommand="$COMPOSERCOMMAND update --no-dev"
+#      $composerNovaUpdateCommand
 #      echo "running npm for current component ($NOVACOMPONENTSPATH)"
 #
 #      #remove node_modules if exists
@@ -178,49 +203,73 @@ fi
 
 #echo "Updating composer (Optional)"
 #composer self-update
+composerSelfUpdateCommand="$COMPOSERCOMMAND self-update"
+$composerSelfUpdateCommand
 
 echo "Running composer install"
-composer install --optimize-autoloader --no-dev
+#composer install --optimize-autoloader --no-dev
+composerInstallCommand="$COMPOSERCOMMAND install --optimize-autoloader --no-dev"
+$composerInstallCommand
 
 #echo "Running outstanding migrations"
 #php artisan migrate --force
+#migrateCommand="$PHPEXECUTABLE artisan migrate --force"
+#$migrateCommand
 
 echo "Clearing Cache"
-php artisan cache:clear
-php artisan config:cache
+#php artisan cache:clear
+#php artisan config:cache
+clearCacheCommand="$PHPEXECUTABLE artisan cache:clear"
+cacheConfigCommand="$PHPEXECUTABLE artisan config:cache"
+$clearCacheCommand
+$cacheConfigCommand
 
 echo "Cache routes"
-php artisan route:cache
+#php artisan route:cache
+cacheRoutesCommand="$PHPEXECUTABLE artisan route:cache"
+$cacheRoutesCommand
 
 echo "Caching views"
-php artisan view:clear
-php artisan view:cache
+#php artisan view:clear
+#php artisan view:cache
+clearViewsCommand="$PHPEXECUTABLE artisan view:clear"
+cacheViewsCommand="$PHPEXECUTABLE artisan view:cache"
+$clearViewsCommand
+$cacheViewsCommand
 
 echo "Bringing Application Online"
-php artisan up
+#php artisan up
+upCommand="$PHPEXECUTABLE artisan up"
+$upCommand
 
 echo "checking if first deployment"
 
 if [[ -f "$LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH" ]]; then
  #generate app key if not not yet generated
  echo "app key not yet generated, generating"
- php artisan key:generate
+ #php artisan key:generate
+ generateKeyCommand="$PHPEXECUTABLE artisan key:generate"
+ $generateKeyCommand
 
  rm -f $LARAVEL_APP_KEY_NOT_GENERATED_FILEPATH
 
  #link storage
  echo "linking storage also"
- php artisan storage:link
+ #php artisan storage:link
+ linkStorageCommand="$PHPEXECUTABLE artisan storage:link"
+ $linkStorageCommand
 else
  echo "not first deployment, not generating key and linking storage"
 fi
 
 #set proper permissions on files
 echo "setting proper permissions"
-sudo $DEBLOYROOT/ci/set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME"
+sudo ./set-webfolder-permissions "$WEBDIRECTORY" "$ADMINUSERNAME" "$WEBSERVERUSER" "$WEBSERVERUSERGROUP"
 
 echo "Restarting queue workers"
-php artisan queue:restart
+#php artisan queue:restart
+restartQueuesCommand="$PHPEXECUTABLE artisan queue:restart"
+$restartQueuesCommand
 echo "Restart queues OK"
 
 echo "Deployment finished!"

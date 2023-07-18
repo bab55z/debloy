@@ -87,9 +87,11 @@ laravel:
   version: 9.0.0 #full laravel version e.g. 8.0.1, used to retrieve latest .env.example,...
 server:
   hostname: server.domain.com
-  username: coolboy #remote server user name
-  email: coolboy@domain.com
+  username: username #remote server user name
+  email: username@domain.com
 php:
+  executable: php #php executable name, edit if you want to use a custom command to run php during ci/cd, e.g. php7.4
+  composer-command: composer #composer executable name, edit if you want to use a custom command to run composer during ci/cd deployments, e.g. php7.4 /usr/local/bin/composer
   fpm-sock: unix:/var/run/php8.1-fpm.sock
 database:
   type: mysql #mysql
@@ -104,6 +106,8 @@ git-bare:
   repo-name: debloy.com.git # the git-bare repository name
 webserver:
   type: nginx # the web server used to run the app: nginx only supported
+  user: www-data # the web server username
+  user-group: www-data # the web server user group name
   folder: /var/www/html/production/debloy.com # app web root folder
   domain-name:
     main: debloy.com #the main domain name of your web app
