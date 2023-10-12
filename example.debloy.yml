@@ -28,7 +28,7 @@ webserver:
   user-group: www-data # the web server user group name
   folder: /var/www/html/production/debloy.com # app web root folder
   domain-name:
-    main: debloy.com #the main domain name of your web app
+    enable-www: true # an additional domain name prefixed with 'www' will be used in the whole setup
     production: debloy.com #the production environment domain name of your web app
     dev: dev.debloy.com #the dev environment domain name of your web app
     stage: stage.debloy.com #the stage environment domain name of your web app

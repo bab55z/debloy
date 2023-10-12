@@ -87,15 +87,23 @@ D_ENV=${environment,,}
 DEPLOY_GIT_FOLDER="$git_bare_root_folder/$git_bare_repo_name"
 
 DOMAIN_NAME_VARIABLE="webserver_domain_name_${D_ENV}"
-MAIN_DOMAIN_NAME="$webserver_domain_name_main"
+ENABLE_WWW_DN="$webserver_domain_name_enable_www"
 DOMAIN_NAME="${!DOMAIN_NAME_VARIABLE}"
+
+NGINX_DOMAIN_PARAMS="${DOMAIN_NAME}"
+CERTBOT_DOMAIN_PARAMS=" -d ${DOMAIN_NAME}"
+
+if [ "$ENABLE_WWW_DN" = true ]; then
+    CERTBOT_DOMAIN_PARAMS="-d ${CERTBOT_DOMAIN_PARAMS}, www.${DOMAIN_NAME}"
+    NGINX_DOMAIN_PARAMS="${NGINX_DOMAIN_PARAMS} www.${DOMAIN_NAME}"
+fi
 
 POST_RECEIVE_HOOK_PATH="${git_bare_repo_name}/hooks/post-receive"
 POST_RECEIVE_HOOK_SCRIPT_PATH="${git_bare_repo_name}/hooks/post-receive-script"
 FOLDER_PERMISSIONS_SCRIPT_PATH="${git_bare_repo_name}/hooks/set-webfolder-permissions"
 SUDOERS_PERMISSIONS_PATH="/etc/sudoers.d/${git_bare_repo_name//.}_folder_permission_script"
 
-NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${MAIN_DOMAIN_NAME}"
+NGINX_HOST_FILE_PATH="/etc/nginx/sites-available/${DOMAIN_NAME}"
 NGINX_ENABLED_SITES_PATH="/etc/nginx/sites-enabled/"
 
 ENV_TEMPLATE_URL="https://raw.githubusercontent.com/laravel/laravel/v$laravel_version/.env.example"
@@ -172,7 +180,7 @@ sudo bash -c "cat ${DEBLOYROOT}/stubs/nginx-host >> $NGINX_HOST_FILE_PATH"
 echo -e "creating nginx host file ${Cyan}done${NoColor}"
 
 echo "configuring nginx host file"
-sudo sed -i "s=SERVERNAMEVALUE=${DOMAIN_NAME}=" "$NGINX_HOST_FILE_PATH"
+sudo sed -i "s=SERVERNAMEVALUE=${NGINX_DOMAIN_PARAMS}=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=ROOTDIRVALUE=${webserver_folder}/public=" "$NGINX_HOST_FILE_PATH"
 sudo sed -i "s=PHPFPMSOCKVALUE=${php_fpm_sock}=" "$NGINX_HOST_FILE_PATH"
 echo -e "configuring nginx host file ${Cyan}done${NoColor}"
@@ -187,7 +195,7 @@ if sudo nginx -t 2>&1 | grep 'successful'; then
    echo -e "enabled site ${Cyan}done${NoColor}"
 
    echo "setting up ssl certificate via certbot"
-   sudo bash -c "sudo certbot run -n --nginx --agree-tos -d $MAIN_DOMAIN_NAME -m ${server_email} --redirect --no-eff-email"
+   sudo bash -c "sudo certbot run -n --nginx --agree-tos $CERTBOT_DOMAIN_PARAMS -m ${server_email} --redirect --no-eff-email"
    echo -e "SSL certificate setup ${Cyan}done${NoColor}"
 
 else
