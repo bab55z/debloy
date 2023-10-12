@@ -23,7 +23,7 @@ BWhite='\033[1;37m'       # White
 
 DEBLOYROOT="/var/repo/debloy"
 DEBLOYYAMLFILE="debloy.yml"
-DBDUMPFILE=
+DBDUMPFILE=""
 
 PARAMS=""
 
